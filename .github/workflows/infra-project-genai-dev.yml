@@ -11,7 +11,6 @@ on:
 env:
     # Flow control
     ENABLE_STEP: 'true' # Enable/Disable a step
-    RUN_JOB1_NETWORKING: 'true' # Enable/Disable networking step
     
     # ADMIN usual culprits - verify, twice. (only configure once)
     admin_bicep_kv_fw: "esaifac-seeding-sdc-001" # seeding keyvault, name
@@ -72,7 +71,7 @@ jobs:
     name: ESGenAI Project Networking
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    if: ${{vars.RUN_JOB1_NETWORKING}} != 'false'
+    if: ${{ vars.RUN_JOB1_NETWORKING != 'false' }}
     defaults:
       run:
         shell: pwsh
