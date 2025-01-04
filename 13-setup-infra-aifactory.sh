@@ -6,26 +6,92 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-################### VARIABLES ###################
-use_gha_bicep=true
-
-use_gha_terraform=false
-use_ado_bicep=false
-################### VARIABLES ###################
-
-# 01. Setup and Preparation
-
 # DIRECTORIES
 current_dir=$(pwd)
-aif_dir="$current_dir/aifactory"
-gha_bicep_dir="$aif_dir/esml-infra/github-actions/bicep/github-actions/"
-gha_workflow_dir=".github/workflows"
 
-# Create the workflow directory
+# Function to check if a variable exists
+check_variable_exists() {
+  gh api repos/$GITHUB_NEW_REPO/environments/$1/variables/$2 > /dev/null 2>&1
+}
 
-# Copy workflows
-if [ "$use_gha_bicep" = true ]; then
-    echo -e "${YELLOW}01. Copy pipelines to $gha_workflow_dir ${NC}"
-    mkdir -p $gha_workflow_dir
-    cp "$gha_bicep_dir" "$gha_workflow_dir" -r
-fi
+# Function to create or update a variable
+create_or_update_variable() {
+  local env=$1
+  local name=$2
+  local value=$3
+  if check_variable_exists $env $name; then
+    gh api --method PATCH -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/$env/variables/$name -f value="$value"
+  else
+    gh api --method POST -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/$env/variables -f name=$name -f value="$value"
+  fi
+}
+
+# Function to check if a secret exists
+check_secret_exists() {
+  gh secret list --repo $GITHUB_NEW_REPO --env $1 | grep -q $2
+}
+
+# Function to create or update a secret
+create_or_update_secret() {
+  local env=$1
+  local name=$2
+  local value=$3
+  if check_secret_exists $env $name; then
+    gh secret set $name --repo $GITHUB_NEW_REPO --env $env --body "$value"
+  else
+    gh secret set $name --repo $GITHUB_NEW_REPO --env $env --body "$value"
+  fi
+}
+
+echo -e "${YELLOW}Bootstraps config from .env as Github environment variables and secrets. ${NC}"
+
+# Get the GitHub CLI version
+gh_version=$(gh --version | grep -oP '\d+\.\d+\.\d+')
+
+# Define environments
+environments=("dev" "stage" "prod")
+
+# AI Factory globals: variables and secrets
+for env in "${environments[@]}"; do
+    echo -e "${YELLOW}Setting variables and secrets for environment: $env${NC}"
+    
+    # Global: Variables
+    create_or_update_variable $env "AIFACTORY_LOCATION" "$AIFACTORY_LOCATION"
+    create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
+    
+    # Global: Secrets
+    create_or_update_secret $env "AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID" "$AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID"
+    
+    # Project Specifics (1st project bootstrap): Secrets
+    create_or_update_secret $env "PROJECT_MEMBERS" "$PROJECT_MEMBERS"
+    create_or_update_secret $env "PROJECT_MEMBERS_EMAILS" "$PROJECT_MEMBERS_EMAILS"
+    create_or_update_secret $env "PROJECT_MEMBERS_IP_ADDRESS" "$PROJECT_MEMBERS_IP_ADDRESS"
+done
+
+# DEV variables
+gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/dev
+create_or_update_variable "dev" "AZURE_ENV_NAME" "$DEV_NAME"
+create_or_update_variable "dev" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
+create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version"
+
+# DEV: Secrets
+create_or_update_secret "dev" "AZURE_SUBSCRIPTION_ID" "$DEV_SUBSCRIPTION_ID"
+create_or_update_secret "dev" "AZURE_CREDENTIALS" "replace_with_dev_sp_credencials"
+
+# STAGE variables
+gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/stage
+create_or_update_variable "stage" "AZURE_ENV_NAME" "$STAGE_NAME"
+create_or_update_variable "stage" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
+
+# STAGE: Secrets
+create_or_update_secret "stage" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID"
+create_or_update_secret "stage" "AZURE_CREDENTIALS" "replace_with_stage_sp_credencials"
+
+# PROD variables
+gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/prod
+create_or_update_variable "prod" "AZURE_ENV_NAME" "$PROD_NAME"
+create_or_update_variable "prod" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
+
+# PROD: Secrets
+create_or_update_secret "prod" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
+create_or_update_secret "prod" "AZURE_CREDENTIALS" "replace_with_prod_sp_credencials"
