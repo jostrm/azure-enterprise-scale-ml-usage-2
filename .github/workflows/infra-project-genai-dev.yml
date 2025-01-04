@@ -68,6 +68,13 @@ jobs:
     #env:
     #  dev_test_prod: "dev"
     steps:
+    - name: Set environment variable
+      run: |
+        $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
+        echo "admin_ip_jocke=$resp" >> $GITHUB_ENV
+    - name: Use environment variable
+      run: |
+        echo "The value of admin_ip_jocke is $admin_ip_jocke"
     - name: Azure Login
       uses: azure/login@v2
       with:
@@ -78,19 +85,16 @@ jobs:
       with:
         submodules: true
     - name: 10_Get ADO IP for agent
-      uses: azure/powershell@v2
-      with:
-        inlineScript: |
-          $resp = $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
-                  Write-Host $resp
-                  echo "admin_ip_fw=$resp" >> $GITHUB_ENV
-                  $ipAddr = $resp
-                  Write-Host ipAddr is: ${{ env.admin_ip_fw }}
-        azPSVersion: latest
+      run: |
+        $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
+        echo "admin_ip_jocke=$resp" >> $GITHUB_ENV
+    - name: Use environment variable
+      run: |
+        echo "The value of admin_ip_jocke is $admin_ip_jocke"
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
-        inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address ${{ env.admin_ip_fw }}
+        inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $admin_ip_jocke
         azcliversion: latest
     - name: 10_download_keyvault_secrets
       uses: azure/cli@v2
