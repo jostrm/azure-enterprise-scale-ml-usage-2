@@ -18,10 +18,10 @@ env:
     # ADMIN specific START (only configure once)
     admin_ip_fw: "192.x.x.x" # Do not touch. leave as-is. This is just a placeholder a script will populate later.
     admin_bicep_input_keyvault_subscription: "${{ secrets.AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID }}" # seeding keyvault, subscription id
-    admin_location: "${{ env.AIFACTORY_LOCATION }}"
-    admin_locationSuffix: "${{ env.AIFACTORY_LOCATION_SHORT }}"
-    dev_test_prod_sub_id: "${{ secrets.AZURE_SUBSCRIPTION_ID }}" # "a1234567-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #"${{ env.env_dev_subid }}" "${{ secrets.env_dev_subid }}"
-    dev_test_prod: "${{ env.AZURE_ENV_NAME }}" # ESML AIFactory environment: [dev,test,prod]
+    admin_location: "${{ AIFACTORY_LOCATION }}"
+    admin_locationSuffix: "${{ AIFACTORY_LOCATION_SHORT }}"
+    dev_test_prod_sub_id: "${{ secrets.AZURE_SUBSCRIPTION_ID }}" # "a1234567-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #"${{ env_dev_subid }}" "${{ secrets.env_dev_subid }}"
+    dev_test_prod: "${{ AZURE_ENV_NAME }}" # ESML AIFactory environment: [dev,test,prod]
    
     # PROJECT specific START (configure for each project)
     project_IP_whitelist: "${{ secrets.PROJECT_MEMBERS_IP_ADDRESS }}" # "192.x.x.x"
@@ -85,19 +85,19 @@ jobs:
                   Write-Host $resp
                   Write-Host "##vso[task.setvariable variable=admin_ip_fw]$resp"
                   $ipAddr = $resp
-                  Write-Host ipAddr is: ${{ env.admin_ip_fw }}
+                  Write-Host ipAddr is: ${{ admin_ip_fw }}
         azPSVersion: latest
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
-        inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address ${{ env.admin_ip_fw }}
+        inlineScript: az keyvault network-rule add --resource-group ${{ admin_bicep_kv_fw_rg }} --name ${{ admin_bicep_kv_fw }} --ip-address ${{ admin_ip_fw }}
         azcliversion: latest
     - name: 10_download_keyvault_secrets
       uses: azure/cli@v2
       with:
         inlineScript: |
-          echo "common-sp-appid-value=$(az keyvault secret show --vault-name ${{ env.admin_bicep_kv_fw }} --name ${{ env.common-sp-appid-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
-          echo "common-sp-secret-value=$(az keyvault secret show --vault-name ${{ env.admin_bicep_kv_fw }} --name ${{ env.common-sp-secret-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
+          echo "common-sp-appid-value=$(az keyvault secret show --vault-name ${{ admin_bicep_kv_fw }} --name ${{ common-sp-appid-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
+          echo "common-sp-secret-value=$(az keyvault secret show --vault-name ${{ admin_bicep_kv_fw }} --name ${{ common-sp-secret-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
         azcliversion: latest
     - name: Copy pipelineFunctions Module to Root
       uses: azure/powershell@v2
@@ -109,27 +109,27 @@ jobs:
       uses: azure/powershell@v2
       with:
         inlineScript: |
-          sudo pwsh -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force ; ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ env.admin_location }}' -locationSuffixADO '${{ env.admin_locationSuffix }}' -useServicePrincipal -projectTypeADO '${{ env.admin_projectType }}'
+          sudo pwsh -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force ; ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -spObjId '${{ common-sp-appid-value }}' -spSecret '${{ common-sp-secret-value }}' -env '${{ dev_test_prod }}' -subscriptionId '${{ dev_test_prod_sub_id }}' -prjResourceSuffix '${{ admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ admin_commonResourceSuffix }}' -locationADO '${{ admin_location }}' -locationSuffixADO '${{ admin_locationSuffix }}' -useServicePrincipal -projectTypeADO '${{ admin_projectType }}'
         azPSVersion: latest
     - name: 21_Deploy subnets and NSG
       uses: azure/cli@v2
       with:
         inlineScript: |
           az deployment group create \
-          --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}${{ env.admin_aifactorySuffixRG }}SubnetDeplProj" \
-          --subscription "${{ env.dev_test_prod_sub_id }}" \
+          --name "esml-p${{ project_number_000 }}-${{ dev_test_prod }}-${{ admin_locationSuffix }}${{ admin_aifactorySuffixRG }}SubnetDeplProj" \
+          --subscription "${{ dev_test_prod_sub_id }}" \
           --resource-group "$( cat "./aifactory/parameters/subnetParameters.json" | grep vnetResourceGroup -A1 | tail -n1 | cut -d: -f2 | tr -d " \"" )" \
           --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\21-network.bicep" \
           --parameters @"./aifactory/parameters/subnetParameters.json" \
           --parameters @"./aifactory/parameters/10-esml-globals-override.json" \
-          --parameters env="${{ env.dev_test_prod }}" \
-          --parameters projectNumber="${{ env.project_number_000 }}"
+          --parameters env="${{ dev_test_prod }}" \
+          --parameters projectNumber="${{ project_number_000 }}"
         azcliversion: latest
     - name: 21_to_22_Generate network parameters
       uses: azure/powershell@v2
       with:
         inlineScript: |
-          sudo pwsh -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force ; ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -env '${{ env.dev_test_prod }}' -locationSuffixADO '${{ env.admin_locationSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -projectNumber '${{ env.project_number_000 }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -projectTypeADO '${{ env.admin_projectType }}"
+          sudo pwsh -Command "Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force ; ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/genDynamicNetworkParamFile.ps1 -spObjId '${{ common-sp-appid-value }}' -spSecret '${{ common-sp-secret-value }}' -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -env '${{ dev_test_prod }}' -locationSuffixADO '${{ admin_locationSuffix }}' -aifactorySuffixRGADO '${{ admin_aifactorySuffixRG }}' -projectNumber '${{ project_number_000 }}' -subscriptionId '${{ dev_test_prod_sub_id }}' -projectTypeADO '${{ admin_projectType }}"
         azPSVersion: latest
     - name: 30_Sleep for 1 minute
       run: |
@@ -141,9 +141,9 @@ jobs:
       with:
         inlineScript: |
           az deployment sub create \
-          --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
-          --subscription "${{ env.dev_test_prod_sub_id }}" \
-          --location "${{ env.admin_location }}" \
+          --name "esml-p${{ project_number_000 }}-${{ dev_test_prod }}-${{ admin_locationSuffix }}-${{ admin_prjResourceSuffix }}${{ admin_commonResourceSuffix }}$PrjDepl" \
+          --subscription "${{ dev_test_prod_sub_id }}" \
+          --location "${{ admin_location }}" \
           --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\22-main.bicep" \
           --parameters adminPassword="$( date +%s | sha256sum | base64 | head -c 32 ; echo )" \
           --parameters @"./aifactory/parameters/10-esml-globals-1.json" \
@@ -156,40 +156,40 @@ jobs:
           --parameters @"./aifactory/parameters/dynamicNetworkParams.json" \
           --parameters @"./aifactory/parameters/23-esml-prj-rbac-parameters.json" \
           --parameters @"./aifactory/parameters/31-esgenai-default.json" \
-          --parameters env="${{ env.dev_test_prod }}" \
-          --parameters projectNumber="${{ env.project_number_000 }}" \
-          --parameters technicalAdminsObjectID="${{ env.technical_admins_ad_object_id }}" \
-          --parameters technicalAdminsEmail="${{ env.technical_admins_email }}" \
-          --parameters location="${{ env.admin_location }}" \
-          --parameters locationSuffix="${{ env.admin_locationSuffix }}" \
-          --parameters resourceSuffix="${{ env.admin_prjResourceSuffix }}" \
-          --parameters aifactorySuffixRG="${{ env.admin_aifactorySuffixRG }}" \
-          --parameters commonResourceSuffix="${{ env.admin_commonResourceSuffix }}" \
-          --parameters projectServicePrincipleOID_SeedingKeyvaultName="${{ env.project_service_principal_OID_seeding_kv_name }}" \
-          --parameters projectServicePrincipleAppID_SeedingKeyvaultName="${{ env.project_service_principal_AppID_seeding_kv_name }}" \
-          --parameters projectServicePrincipleSecret_SeedingKeyvaultName="${{ env.project_service_principal_Secret_seeding_kv_name }}" \
-          --parameters inputKeyvault="${{ env.admin_bicep_kv_fw }}" \
-          --parameters inputKeyvaultResourcegroup="${{ env.admin_bicep_kv_fw_rg }}" \
-          --parameters inputKeyvaultSubscription="${{ env.admin_bicep_input_keyvault_subscription }}" \
-          --parameters aks_dev_sku_override="${{ env.admin_aks_gpu_sku_dev_override }}" \
-          --parameters aks_test_prod_sku_override="${{ env.admin_aks_gpu_sku_test_prod_override }}" \
-          --parameters aks_dev_nodes_override="${{ env.admin_aks_nodes_dev_override }}" \
-          --parameters aks_test_prod_nodes_override="${{ env.admin_aks_nodes_testProd_override }}" \
-          --parameters aks_version_override="${{ env.admin_aks_version_override }}" \
-          --parameters aml_cluster_dev_sku_override="${{ env.admin_aml_cluster_sku_dev_override }}" \
-          --parameters aml_cluster_test_prod_sku_override="${{ env.admin_aml_cluster_sku_testProd_override }}" \
-          --parameters aml_cluster_dev_nodes_override="${{ env.admin_aml_cluster_maxNodes_dev_override }}" \
-          --parameters aml_ci_dev_sku_override="${{ env.admin_aml_computeInstance_dev_sku_override }}" \
-          --parameters aml_ci_test_prod_sku_override="${{ env.admin_aml_computeInstance_testProd_sku_override }}" \
-          --parameters enablePublicGenAIAccess="${{ env.admin_enablePublicGenAIAccess }}" \
-          --parameters serviceSettingDeployAzureAIVision="${{ env.optional_serviceSettingDeployAzureAIVision }}" \
-          --parameters serviceSettingDeployAzureSpeech="${{ env.optional_serviceSettingDeployAzureSpeech }}" \
-          --parameters serviceSettingDeployAIDocIntelligence="${{ env.optional_serviceSettingDeployAIDocIntelligence }}" \
-          --parameters IPwhiteList="${{ env.project_IP_whitelist }}"
+          --parameters env="${{ dev_test_prod }}" \
+          --parameters projectNumber="${{ project_number_000 }}" \
+          --parameters technicalAdminsObjectID="${{ technical_admins_ad_object_id }}" \
+          --parameters technicalAdminsEmail="${{ technical_admins_email }}" \
+          --parameters location="${{ admin_location }}" \
+          --parameters locationSuffix="${{ admin_locationSuffix }}" \
+          --parameters resourceSuffix="${{ admin_prjResourceSuffix }}" \
+          --parameters aifactorySuffixRG="${{ admin_aifactorySuffixRG }}" \
+          --parameters commonResourceSuffix="${{ admin_commonResourceSuffix }}" \
+          --parameters projectServicePrincipleOID_SeedingKeyvaultName="${{ project_service_principal_OID_seeding_kv_name }}" \
+          --parameters projectServicePrincipleAppID_SeedingKeyvaultName="${{ project_service_principal_AppID_seeding_kv_name }}" \
+          --parameters projectServicePrincipleSecret_SeedingKeyvaultName="${{ project_service_principal_Secret_seeding_kv_name }}" \
+          --parameters inputKeyvault="${{ admin_bicep_kv_fw }}" \
+          --parameters inputKeyvaultResourcegroup="${{ admin_bicep_kv_fw_rg }}" \
+          --parameters inputKeyvaultSubscription="${{ admin_bicep_input_keyvault_subscription }}" \
+          --parameters aks_dev_sku_override="${{ admin_aks_gpu_sku_dev_override }}" \
+          --parameters aks_test_prod_sku_override="${{ admin_aks_gpu_sku_test_prod_override }}" \
+          --parameters aks_dev_nodes_override="${{ admin_aks_nodes_dev_override }}" \
+          --parameters aks_test_prod_nodes_override="${{ admin_aks_nodes_testProd_override }}" \
+          --parameters aks_version_override="${{ admin_aks_version_override }}" \
+          --parameters aml_cluster_dev_sku_override="${{ admin_aml_cluster_sku_dev_override }}" \
+          --parameters aml_cluster_test_prod_sku_override="${{ admin_aml_cluster_sku_testProd_override }}" \
+          --parameters aml_cluster_dev_nodes_override="${{ admin_aml_cluster_maxNodes_dev_override }}" \
+          --parameters aml_ci_dev_sku_override="${{ admin_aml_computeInstance_dev_sku_override }}" \
+          --parameters aml_ci_test_prod_sku_override="${{ admin_aml_computeInstance_testProd_sku_override }}" \
+          --parameters enablePublicGenAIAccess="${{ admin_enablePublicGenAIAccess }}" \
+          --parameters serviceSettingDeployAzureAIVision="${{ optional_serviceSettingDeployAzureAIVision }}" \
+          --parameters serviceSettingDeployAzureSpeech="${{ optional_serviceSettingDeployAzureSpeech }}" \
+          --parameters serviceSettingDeployAIDocIntelligence="${{ optional_serviceSettingDeployAIDocIntelligence }}" \
+          --parameters IPwhiteList="${{ project_IP_whitelist }}"
         azcliversion: latest
     - name: 10_Remove ADO IP from keyvault FW whitelist
       uses: azure/cli@v2
       with:
-        inlineScript: az keyvault network-rule remove --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address ${{ env.admin_ip_fw }}
+        inlineScript: az keyvault network-rule remove --resource-group ${{ admin_bicep_kv_fw_rg }} --name ${{ admin_bicep_kv_fw }} --ip-address ${{ admin_ip_fw }}
         azcliversion: latest
       if: always()
