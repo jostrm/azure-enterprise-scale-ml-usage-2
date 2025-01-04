@@ -110,24 +110,26 @@ jobs:
       uses: azure/powershell@v2
       with:
         inlineScript: |
-          sudo pwsh -Command "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 
-          -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' 
-          -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' 
-          -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' 
-          -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' 
-          -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' 
-          -filePath './aifactory/parameters/' 
-          -spObjId '${{ env.common-sp-appid-value }}' 
-          -spSecret '${{ env.common-sp-secret-value }}' 
-          -env '${{ env.AZURE_ENV_NAME }}' 
-          -subscriptionId '${{ env.AZURE_ENV_NAME_sub_id }}' 
-          -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' 
-          -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' 
-          -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' 
-          -locationADO '${{ env.AIFACTORY_LOCATION }}' 
-          -locationSuffixADO '${{ env.AIFACTORY_LOCATIONSuffix }}' 
-          -useServicePrincipal 
-          -projectTypeADO '${{ env.admin_projectType }}'"
+          sudo pwsh -Command "
+            ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 `
+              -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' `
+              -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' `
+              -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' `
+              -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' `
+              -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' `
+              -filePath './aifactory/parameters/' `
+              -spObjId '${{ env.common-sp-appid-value }}' `
+              -spSecret '${{ env.common-sp-secret-value }}' `
+              -env '${{ env.AZURE_ENV_NAME }}' `
+              -subscriptionId '${{ env.AZURE_ENV_NAME_sub_id }}' `
+              -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' `
+              -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' `
+              -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' `
+              -locationADO '${{ env.AIFACTORY_LOCATION }}' `
+              -locationSuffixADO '${{ env.AIFACTORY_LOCATIONSuffix }}' `
+              -useServicePrincipal `
+              -projectTypeADO '${{ env.admin_projectType }}'
+          "
         azPSVersion: latest
     - name: 21_Deploy subnets and NSG
       uses: azure/cli@v2
