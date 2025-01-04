@@ -83,7 +83,7 @@ jobs:
         inlineScript: |
           $resp = $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
                   Write-Host $resp
-                  echo "admin_ip_fw=$resp" >> $admin_ip_fw
+                  echo "admin_ip_fw=$resp" >> $GITHUB_ENV
                   $ipAddr = $resp
                   Write-Host ipAddr is: ${{ env.admin_ip_fw }}
         azPSVersion: latest
