@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "projectOwnerId": {
-            "value": "TODO_ObjectId_For_AD_User"
+            "value": "4dd75919-56b3-4e7e-a265-dc96f9cd4a58"
         },
         "projectOwnerEmail": {
-            "value": "batman@gothamcity.dc_"
+            "value": "jostrm@microsoft.com"
         },
         "technicalContactId": {
-            "value": "TODO_ObjectId_For_AD_User"
+            "value": "4dd75919-56b3-4e7e-a265-dc96f9cd4a58"
         },
         "technicalContactEmail": {
-            "value": "batman@gothamcity.dc_"
+            "value": "jostrm@microsoft.com"
         },
         "projectServicePrincipleOID_SeedingKeyvaultName": {
             "value": "esml-project001-sp-oid"

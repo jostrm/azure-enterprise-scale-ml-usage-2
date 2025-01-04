@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "inputKeyvault": {
-            "value": "done_from_ADO_var"
+            "value": "esaifac-seeding-sdc-001"
         },
         "inputKeyvaultSubscription": {
-            "value": "done_from_ADO_var"
+            "value": "612e830e-b795-424e-ba5d-cd0a5dadecf4"
         },
         "inputKeyvaultResourcegroup": {
-            "value": "done_from_ADO_var"
+            "value": "spoke-aifactory-sdc-dev-001"
         },
         "inputCommonSPIDKey": {
             "value": "esml-common-sp-id"

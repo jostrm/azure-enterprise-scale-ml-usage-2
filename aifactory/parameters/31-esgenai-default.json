@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "enablePublicGenAIAccess": {
-            "value": false
+            "value": true
         },
         "allowPublicAccessWhenBehindVnet": {
             "value": true

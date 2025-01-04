@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetResourceGroup_param": {
-            "value": ""
+            "value": "spoke-aifactory-sdc-dev-001"
         },
         "vnetNameFull_param": {
-            "value": ""
+            "value": "vnet-spoke-aifactory-sdc-dev-001"
         },
         "commonResourceGroup_param": {
             "value": ""
@@ -18,7 +18,7 @@
             "value": ""
         },
         "useCommonACR": {
-            "value": false
+            "value": true
         }
     }
 }

@@ -15,7 +15,7 @@
 			"value": "snet-esml-cmn-pbi-001"
 		},
         "common_pbi_subnet_cidr": {
-			"value": "10.XX.32.0/24"
+			"value": "10.XX.32.0/25"
 		},
         "common_bastion_subnet_name": {
 			"value": "AzureBastionSubnet"

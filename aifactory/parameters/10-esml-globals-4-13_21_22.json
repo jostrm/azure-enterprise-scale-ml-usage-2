@@ -6,7 +6,7 @@
             "value": "-001"
         },
         "commonLakeNamePrefixMax8chars":{
-			"value": "xxxyyy"
+			"value": "mrvel"
 		},
         "hybridBenefit":{
             "value": true
@@ -24,16 +24,16 @@
             "value": "XX.XXX.XXX.XX"
         },
         "centralDnsZoneByPolicyInHub": {
-            "value": false
+            "value": true
         },
         "privDnsSubscription_param": {
-            "value": ""
+            "value": "5cd131eb-5379-4eb7-beee-996ec20f02b8"
         },
         "privDnsResourceGroup_param": {
-            "value": ""
+            "value": "platform-connectivity"
         },
         "tenantId": {
-            "value": "todo_guid"
+            "value": "d06d9bae-d2c3-48a1-a76f-05221564d208"
         }
     }
 }
