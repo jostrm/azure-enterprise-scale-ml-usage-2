@@ -146,7 +146,7 @@ jobs:
         write-host "Waiting for subnets to fully register to subscription"
         Start-Sleep 60
       shell: pwsh
-    - name: Set output
+    - name: Set output job1_ran=true or false
       id: set_output
       run: echo "::set-output name=job1_ran::true"
     - name: 10_Remove ADO IP from keyvault FW whitelist
