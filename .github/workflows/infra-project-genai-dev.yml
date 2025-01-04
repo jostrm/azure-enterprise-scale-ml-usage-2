@@ -72,6 +72,7 @@ jobs:
       run: |
         $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
         echo "admin_ip_jocke=$resp" >> $GITHUB_ENV
+      shell: pwsh
     - name: Use environment variable
       run: |
         echo "The value of admin_ip_jocke is $admin_ip_jocke"
@@ -87,7 +88,8 @@ jobs:
     - name: 10_Get ADO IP for agent
       run: |
         $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
-        echo "admin_ip_jocke=$resp" >> $GITHUB_ENV
+        echo "admin_ip_jocke=$resp" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+      shell: pwsh
     - name: Use environment variable
       run: |
         echo "The value of admin_ip_jocke is $admin_ip_jocke"
