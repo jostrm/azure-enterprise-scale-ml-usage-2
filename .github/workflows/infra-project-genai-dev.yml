@@ -11,6 +11,7 @@ on:
 env:
     # Flow control
     ENABLE_STEP: 'true' # Enable/Disable a step
+    RUN_JOB1_NETWORKING: 'true' # Enable/Disable networking step
     
     # ADMIN usual culprits - verify, twice. (only configure once)
     admin_bicep_kv_fw: "esaifac-seeding-sdc-001" # seeding keyvault, name
@@ -67,10 +68,11 @@ env:
     admin_private_azureMLStudioUI: true # Private Azure ML Studio UI
     admin_private_DatabricksUI: false # Private Databricks UI
 jobs:
-  deploy-networking-project-genai:
+  job1-deploy-networking-project-genai:
     name: ESGenAI Project Networking
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
+    if: ${{ env.RUN_JOB1_NETWORKING != 'false' }}
     defaults:
       run:
         shell: pwsh
@@ -145,16 +147,22 @@ jobs:
         write-host "Waiting for subnets to fully register to subscription"
         Start-Sleep 60
       shell: pwsh
+    - name: Set output
+      id: set_output
+      run: echo "::set-output name=job1_ran::true"
     - name: 10_Remove ADO IP from keyvault FW whitelist
       uses: azure/cli@v2
       with:
         inlineScript: az keyvault network-rule remove --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $admin_ip_jocke
         azcliversion: latest
       if: always()
-  deploy-services-project-genai:
+  job2-deploy-services-project-genai:
       name: ESGenAI Project to resource group
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
+      needs: job1-deploy-networking-project-genai
+      env:
+        JOB1_RAN: ${{ needs.job1-deploy-networking-project-genai.outputs.job1_ran }}
       defaults:
         run:
           shell: pwsh
