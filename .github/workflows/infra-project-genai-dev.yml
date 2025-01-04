@@ -71,7 +71,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/
+        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     #env:
     #  dev_test_prod: "dev"
     steps:
