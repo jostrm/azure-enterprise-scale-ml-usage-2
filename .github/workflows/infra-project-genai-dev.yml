@@ -98,7 +98,7 @@ jobs:
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
-        inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $admin_ip_jocke
+        inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address ${{ env.admin_ip_jocke }}
         azcliversion: latest
     - name: 10_download_keyvault_secrets
       uses: azure/cli@v2
