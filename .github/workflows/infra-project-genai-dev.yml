@@ -75,7 +75,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
+        #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
     - name: Azure Login
       uses: azure/login@v2
@@ -116,12 +116,15 @@ jobs:
     - name: 20_Calculate subnet allocations_PS
       uses: azure/powershell@v2
       with:
+        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
         inlineScript: |
           sudo pwsh -Command "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.test_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }} -useServicePrincipal" 
         azPSVersion: latest
+        shell: pwsh
     - name: 21_Deploy subnets and NSG
       uses: azure/cli@v2
       with:
+        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/"
         inlineScript: |
           echo "Deploying subnets and NSG to subscription: ${{ vars.AZURE_SUBSCRIPTION_ID }}"
           az deployment group create \
@@ -137,6 +140,7 @@ jobs:
     - name: 21_to_22_Generate network parameters
       uses: azure/powershell@v2
       with:
+        working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
         inlineScript: |
           sudo pwsh -Command "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -env '${{ vars.AZURE_ENV_NAME }}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -projectNumber '${{ env.project_number_000 }}' -subscriptionId '${{ vars.AZURE_SUBSCRIPTION_ID }}' -projectTypeADO '${{ env.admin_projectType }}'"
         azPSVersion: latest
@@ -165,7 +169,7 @@ jobs:
       defaults:
         run:
           shell: pwsh
-          working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
+          #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
       steps:
       - name: Azure Login
         uses: azure/login@v2
@@ -206,6 +210,7 @@ jobs:
       - name: 32_Deploy esml project
         uses: azure/cli@v2
         with:
+          working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/"
           inlineScript: |
             az deployment sub create \
             --name "esml-p${{ env.project_number_000 }}-${{ vars.AZURE_ENV_NAME }}-${{ vars.AIFACTORY_LOCATION_SHORT }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
