@@ -94,7 +94,7 @@ jobs:
       shell: pwsh
     - name: Use environment variable
       run: |
-        echo "The value of admin_ip_jocke is $admin_ip_jocke"
+        echo "The value of admin_ip_jocke is: ${{ env.admin_ip_jocke }}"
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
@@ -156,7 +156,7 @@ jobs:
         azcliversion: latest
       if: always()
   job2-deploy-services-project-genai:
-      name: ESGenAI Project to resource group
+      name: ESGenAI services to RG
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
       needs: job1-deploy-networking-project-genai
