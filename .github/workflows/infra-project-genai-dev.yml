@@ -11,7 +11,8 @@ on:
 env:
     # Flow control
     ENABLE_STEP: 'true' # Enable/Disable a step
-    
+    ENABLE_DEBUG_STEP: 'false' # Enable/Disable a step
+        
     # ADMIN usual culprits - verify, twice. (only configure once)
     admin_bicep_kv_fw: "esaifac-seeding-sdc-001" # seeding keyvault, name
     admin_bicep_kv_fw_rg: "spoke-aifactory-sdc-dev-001" #seeding keyvault, resource group
@@ -117,9 +118,10 @@ jobs:
         sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
       shell: pwsh
     - name: 20_B_Calculate subnet allocations_PS
+      if: env.ENABLE_DEBUG_STEP == 'true'
       uses: azure/powershell@v2
       #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
-      with: # Warning: Unexpected input(s) 'working-directory', valid inputs are ['inlineScript', 'azcliversion']
+      with: # Warning: Unexpected input(s) 'working-directory', valid inputs are ['inlineScript', 'azcliversion'] Solution: Set-Location -Path
         inlineScript: |
           sudo pwsh -Command "
             Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
@@ -148,7 +150,22 @@ jobs:
       with:
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
         inlineScript: |
-          sudo pwsh -Command "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -env '${{ vars.AZURE_ENV_NAME }}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -projectNumber '${{ env.project_number_000 }}' -subscriptionId '${{ vars.AZURE_SUBSCRIPTION_ID }}' -projectTypeADO '${{ env.admin_projectType }}'"
+          sudo pwsh -Command "
+          Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
+          ./genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' \
+          -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' \
+          -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' \
+          -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' \
+          -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' \
+          -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' \
+          -filePath '../../../../../aifactory/parameters/' \
+          -env '${{ vars.AZURE_ENV_NAME }}' \
+          -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' \
+          -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' \
+          -projectNumber '${{ env.project_number_000 }}' \
+          -subscriptionId '${{ vars.AZURE_SUBSCRIPTION_ID }}' \
+          -projectTypeADO '${{ env.admin_projectType }}'
+          "
         azPSVersion: latest
     - name: 30_Sleep for 1 minute
       if: env.ENABLE_STEP == 'true'
