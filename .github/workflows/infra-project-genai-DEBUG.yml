@@ -72,6 +72,10 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     steps:
+    - name: GIT
+      uses: actions/checkout@v4
+      with:
+        submodules: true
     - name: Set permissions on WORKSPACE
       run: chmod -R 755 ${{ github.workspace }}
     - name: List workspace directory
