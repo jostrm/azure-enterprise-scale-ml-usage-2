@@ -75,11 +75,11 @@ jobs:
     - name: Set permissions on WORKSPACE
       run: chmod -R 755 ${{ github.workspace }}
     - name: List workspace directory
-      run: ls -al ${{ github.workspace }}
+      run: ls -al ${{ github.workspace }}.
     - name: List RUNNER directory
       run: ls -al ${{ runner.workspace }}
-    - name: List RUNNER /root/
-      run: ls -al "${{ runner.workspace }}/root/"
+    - name: List RUNNER /azure-enterprise-scale-ml-usage-2/
+      run: ls -al "${{ runner.workspace }}/azure-enterprise-scale-ml-usage-2/"
     - name: List workspace directory
       run: ls -al ${{ github.workspace }}
     - name: List aifactory directory
