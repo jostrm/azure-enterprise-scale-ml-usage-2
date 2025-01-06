@@ -72,6 +72,12 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     steps:
+    - name: List RUNNER directory
+      run: ls -al ${{ runner.workspace }}
+    - name: List RUNNER /aifactory/debug/
+      run: ls -al ${{ runner.workspace }}/aifactory/debug/"
+    - name: Set permissions
+      run: chmod -R 755 ${{ github.workspace }}
     - name: List workspace directory
       run: ls -al ${{ github.workspace }}
     - name: List aifactory directory
