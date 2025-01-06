@@ -103,7 +103,12 @@ jobs:
           echo "common-sp-appid-value=$(az keyvault secret show --vault-name ${{ env.admin_bicep_kv_fw }} --name ${{ env.common-sp-appid-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
           echo "common-sp-secret-value=$(az keyvault secret show --vault-name ${{ env.admin_bicep_kv_fw }} --name ${{ env.common-sp-secret-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
         azcliversion: latest
-    - name: 21_to_22_Generate network parameters
+    - name: A_GenDyn
+      working-directory: ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts
+      run: |
+        sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/genDynamicNetworkParamFile.ps1 -spObjId "$(esml-common-bicep-sp-id)" -spSecret "$(esml-common-bicep-sp-secret)" -useServicePrincipal -bicepPar1 "../../../../../aifactory/parameters/10-esml-globals-1.json" -bicepPar2 "../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json" -bicepPar3 "../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json" -bicepPar4 "../../../../../aifactory/parameters/21-22-esml-prj-parameters.json" -filePath "../../../../../aifactory/parameters/" -env "$(dev_test_prod)" -locationSuffixADO "$(admin_locationSuffix)" -aifactorySuffixRGADO "$(admin_aifactorySuffixRG)" -projectNumber "$(project_number_000)" -subscriptionId "$(dev_test_prod_sub_id)" -bicepPar5 "../../../../../aifactory/parameters/10-esml-globals-override.json" -projectTypeADO "$(admin_projectType)"
+      shell: pwsh
+    - name: B_Generate network parameters
       uses: azure/powershell@v2
       with:
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
@@ -126,7 +131,6 @@ jobs:
             -projectTypeADO '${{ env.admin_projectType }}'
           "
         azPSVersion: latest
-        shell: pwsh
     - name: 10_Remove ADO IP from keyvault FW whitelist
       uses: azure/cli@v2
       with:
