@@ -126,6 +126,7 @@ jobs:
             -projectTypeADO '${{ env.admin_projectType }}'
           "
         azPSVersion: latest
+        shell: pwsh
     - name: 10_Remove ADO IP from keyvault FW whitelist
       uses: azure/cli@v2
       with:
