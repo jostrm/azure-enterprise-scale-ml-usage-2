@@ -114,7 +114,7 @@ jobs:
     - name: 20_A_Calculate subnet allocations_PS
       working-directory: ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts
       run: |
-        sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
+        sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
       shell: pwsh
     - name: 20_B_Calculate subnet allocations_PS
       uses: azure/powershell@v2
@@ -123,7 +123,7 @@ jobs:
         inlineScript: |
           sudo pwsh -Command "
             Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
-            ./subnetCalc.ps1 -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' -bicepPar2 './aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 './aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 './aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 './aifactory/parameters/10-esml-globals-override.json' -filePath './aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
+            ./subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ vars.AIFACTORY_LOCATION}}' -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
           "
         azPSVersion: latest
         shell: pwsh
@@ -137,7 +137,7 @@ jobs:
           --name "esml-p${{ env.project_number_000 }}-${{ vars.AZURE_ENV_NAME }}-${{ vars.AIFACTORY_LOCATION_SHORT }}${{ env.admin_aifactorySuffixRG }}SubnetDeplProj" \
           --subscription "${{ vars.AZURE_SUBSCRIPTION_ID }}" \
           --resource-group "$( cat "./aifactory/parameters/subnetParameters.json" | grep vnetResourceGroup -A1 | tail -n1 | cut -d: -f2 | tr -d " \"" )" \
-          --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\21-network.bicep" \
+          --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-genai-1\31-network.bicep" \
           --parameters @"./aifactory/parameters/subnetParameters.json" \
           --parameters @"./aifactory/parameters/10-esml-globals-override.json" \
           --parameters env="${{ vars.AZURE_ENV_NAME }}" \
@@ -222,7 +222,7 @@ jobs:
             --name "esml-p${{ env.project_number_000 }}-${{ vars.AZURE_ENV_NAME }}-${{ vars.AIFACTORY_LOCATION_SHORT }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
             --subscription "${{ vars.AZURE_SUBSCRIPTION_ID }}" \
             --location "${{ vars.AIFACTORY_LOCATION }}" \
-            --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\22-main.bicep" \
+            --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-genai-1\32-main.bicep" \
             --parameters adminPassword="$( date +%s | sha256sum | base64 | head -c 32 ; echo )" \
             --parameters @"./aifactory/parameters/10-esml-globals-1.json" \
             --parameters @"./aifactory/parameters/10-esml-globals-2-12_13_21_22.json" \
