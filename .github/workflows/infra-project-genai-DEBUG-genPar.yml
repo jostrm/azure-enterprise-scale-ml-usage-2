@@ -79,6 +79,11 @@ jobs:
         submodules: true
     - name: Check PowerShell version
       run: pwsh -v
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
