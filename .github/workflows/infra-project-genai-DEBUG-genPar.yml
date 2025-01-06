@@ -90,6 +90,7 @@ jobs:
         $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
         echo "admin_ip_jocke=$resp" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         echo "Environment is (vars.AZURE_ENV_NAME): ${{vars.AZURE_ENV_NAME}}"
+      shell: pwsh
     - name: 10_Set ADO IP to keyvault FW whitelist
       uses: azure/cli@v2
       with:
