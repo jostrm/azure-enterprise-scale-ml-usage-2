@@ -69,9 +69,18 @@ env:
 jobs:
   debug-powershell:
     name: Debug powershell
-    environment: ${{github.event.inputs.environment}}
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     steps:
+    - name: Check directory
+      run: ls -al ${{ github.workspace }}/aifactory/debug
+
+    - name: Set permissions
+      run: chmod -R 755 ${{ github.workspace }}/aifactory/debug
+
+    - name: Check PowerShell version
+      run: pwsh -v
+
     - name: 20_DEBUG_CalcSubnet
       working-directory: "${{ github.workspace }}/aifactory/debug"
       run: |
