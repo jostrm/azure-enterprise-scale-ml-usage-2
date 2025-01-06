@@ -12,6 +12,7 @@ env:
     # Flow control
     ENABLE_STEP: 'true' # Enable/Disable a step
     ENABLE_DEBUG_STEP: 'false' # Enable/Disable a step
+    USE_OTHER_SP: 'false' # Use other service principal than the one in the seeding keyvault
         
     # ADMIN usual culprits - verify, twice. (only configure once)
     admin_bicep_kv_fw: "esaifac-seeding-sdc-001" # seeding keyvault, name
@@ -104,7 +105,8 @@ jobs:
           sudo pwsh -Command "
           Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
           ./genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' \
-          -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' \
+          -useServicePrincipal ${{env.USE_OTHER_SP}} \
+          -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' \
           -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' \
           -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' \
           -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' \
