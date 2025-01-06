@@ -75,7 +75,7 @@ jobs:
     - name: Set permissions on WORKSPACE
       run: chmod -R 755 ${{ github.workspace }}
     - name: List workspace directory
-      run: ls -al ${{ github.workspace }}.
+      run: ls -al ${{ github.workspace }}
     - name: List RUNNER directory
       run: ls -al ${{ runner.workspace }}
     - name: List RUNNER /azure-enterprise-scale-ml-usage-2/
