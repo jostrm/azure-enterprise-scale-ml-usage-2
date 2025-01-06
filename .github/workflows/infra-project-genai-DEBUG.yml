@@ -72,6 +72,10 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     steps:
+    - name: List workspace directory
+      run: ls -al ${{ github.workspace }}
+    - name: List aifactory directory
+      run: ls -al ${{ github.workspace }}/../
     - name: Check directory
       run: ls -al "/home/runner/work/azure-enterprise-scale-ml-usage-2/aifactory/debug/"
 
