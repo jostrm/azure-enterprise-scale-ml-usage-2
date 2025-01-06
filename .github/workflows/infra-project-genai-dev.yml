@@ -151,20 +151,21 @@ jobs:
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
         inlineScript: |
           sudo pwsh -Command "
-          Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
-          ./genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' \
-          -useServicePrincipal -bicepPar1 './aifactory/parameters/10-esml-globals-1.json' \
-          -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' \
-          -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' \
-          -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' \
-          -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' \
-          -filePath '../../../../../aifactory/parameters/' \
-          -env '${{ vars.AZURE_ENV_NAME }}' \
-          -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' \
-          -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' \
-          -projectNumber '${{ env.project_number_000 }}' \
-          -subscriptionId '${{ vars.AZURE_SUBSCRIPTION_ID }}' \
-          -projectTypeADO '${{ env.admin_projectType }}'
+            Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
+            ./genDynamicNetworkParamFile.ps1 -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' `
+            -useServicePrincipal ${{env.USE_OTHER_SP}} `
+            -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' `
+            -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' `
+            -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' `
+            -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' `
+            -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' `
+            -filePath '../../../../../aifactory/parameters/' `
+            -env '${{ vars.AZURE_ENV_NAME }}' `
+            -locationSuffixADO '${{ vars.AIFACTORY_LOCATION_SHORT }}' `
+            -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' `
+            -projectNumber '${{ env.project_number_000 }}' `
+            -subscriptionId '${{ vars.AZURE_SUBSCRIPTION_ID }}' `
+            -projectTypeADO '${{ env.admin_projectType }}'
           "
         azPSVersion: latest
     - name: 30_Sleep for 1 minute
