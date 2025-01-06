@@ -1,4 +1,4 @@
-name: infra-project-genai-DEBUG
+name: infra-project-genai-DEBUG-CalcSnet
 
 on:
     #push:
