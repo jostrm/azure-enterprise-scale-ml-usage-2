@@ -71,7 +71,7 @@ env:
 jobs:
   job1-deploy-networking-project-genai:
     name: ESGenAI Project Networking
-    if: vars.RUN_JOB1_NETWORKING  != 'false'
+    if: vars.RUN_JOB1_NETWORKING
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
     defaults:
