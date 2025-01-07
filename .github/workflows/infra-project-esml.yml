@@ -169,9 +169,7 @@ jobs:
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
       if: always()
-      needs: []
-      #needs: job1-deploy-networking-project-genai
-      # if: needs.job1-deploy-networking-project-genai.result == 'success' || needs.job1-deploy-networking-project-genai.result == 'skipped'
+      needs: job1-deploy-networking-project-genai
       defaults:
         run:
           shell: pwsh
