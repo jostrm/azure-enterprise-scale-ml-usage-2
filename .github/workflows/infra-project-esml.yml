@@ -168,8 +168,9 @@ jobs:
       name: ESGenAI services to RG
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
+      needs: []
       #needs: job1-deploy-networking-project-genai
-      #if: needs.job1-deploy-networking-project-genai.result == 'success' || needs.job1-deploy-networking-project-genai.result == 'skipped'
+      # if: needs.job1-deploy-networking-project-genai.result == 'success' || needs.job1-deploy-networking-project-genai.result == 'skipped'
       defaults:
         run:
           shell: pwsh
