@@ -73,7 +73,7 @@ jobs:
     name: ESGenAI Project Networking
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    if: ${{ vars.RUN_JOB1_NETWORKING != 'false' || env.ENABLE_NETWORKING_JOB == 'true' }}
+    if: ${{ vars.RUN_JOB1_NETWORKING != 'false'}}
     defaults:
       run:
         shell: pwsh
