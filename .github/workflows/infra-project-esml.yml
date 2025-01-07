@@ -71,16 +71,15 @@ env:
 jobs:
   job1-deploy-networking-project-genai:
     name: ESGenAI Project Networking
+    if: vars.RUN_JOB1_NETWORKING  != 'false'
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    if: vars.RUN_JOB1_NETWORKING != 'false'
     defaults:
       run:
         shell: pwsh
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
     - name: Print Skip NETWORKING variable
-      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: |
         echo "The value of vars.RUN_JOB1_NETWORKING  is: ${{ vars.RUN_JOB1_NETWORKING }}"
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
@@ -159,11 +158,12 @@ jobs:
       id: set_output
       run: echo "::set-output name=job1_ran::true"
     - name: 10_Remove ADO IP from keyvault FW whitelist
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/cli@v2
       with:
         inlineScript: az keyvault network-rule remove --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $runner_ip
         azcliversion: latest
-      if: always()
+      #if: always()
   job2-deploy-services-project-genai:
       name: ESGenAI services to RG
       environment: ${{github.event.inputs.environment}}
