@@ -12,6 +12,7 @@ env:
     # Flow control
     ENABLE_STEP: 'false' # Enable/Disable a step
     ENABLE_DEBUG_STEP: 'false' # Enable/Disable a step
+    ENABLE_NETWORKING_JOB: "${{ vars.RUN_JOB1_NETWORKING }}"
         
     # ADMIN usual culprits - verify, twice. (only configure once)
     admin_bicep_input_keyvault_subscription: "${{ secrets.AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID }}" # seeding keyvault, subscription id
@@ -72,12 +73,16 @@ jobs:
     name: ESGenAI Project Networking
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    if: ${{ vars.RUN_JOB1_NETWORKING != 'false' }}
+    if: ${{ vars.RUN_JOB1_NETWORKING != 'false' || env.ENABLE_NETWORKING_JOB == 'true' }}
     defaults:
       run:
         shell: pwsh
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
+    - name: Print Skip NETWORKING variable
+      run: |
+        echo "The value of vars.RUN_JOB1_NETWORKING  is: ${{ vars.RUN_JOB1_NETWORKING }}"
+        echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
     - name: Azure Login
       uses: azure/login@v2
       with:
