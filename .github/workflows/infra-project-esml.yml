@@ -73,40 +73,47 @@ jobs:
     name: ESGenAI Project Networking
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    if: ${{ vars.RUN_JOB1_NETWORKING != 'false'}}
+    if: vars.RUN_JOB1_NETWORKING != 'false'
     defaults:
       run:
         shell: pwsh
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
     - name: Print Skip NETWORKING variable
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: |
         echo "The value of vars.RUN_JOB1_NETWORKING  is: ${{ vars.RUN_JOB1_NETWORKING }}"
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
     - name: Azure Login
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         enable-AzPSSession: true
     - name: GIT
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: actions/checkout@v4
       with:
         submodules: true
     - name: 10_Get ADO IP for agent
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: |
         $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
         echo "runner_ip=$resp" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         echo "Environment is (vars.AZURE_ENV_NAME): ${{env.dev_test_prod}}"
       shell: pwsh
     - name: Use environment variable
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: |
         echo "The value of runner_ip is: ${{ env.runner_ip }}"
     - name: 10_Set ADO IP to keyvault FW whitelist
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/cli@v2
       with:
         inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address ${{ env.runner_ip }}
         azcliversion: latest
     - name: 10_download_keyvault_secrets
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/cli@v2
       with:
         inlineScript: |
@@ -114,15 +121,19 @@ jobs:
           echo "common-sp-secret-value=$(az keyvault secret show --vault-name ${{ env.admin_bicep_kv_fw }} --name ${{ env.common-sp-secret-seeding-kv-name }} --query 'value' --output tsv)" >> $GITHUB_ENV
         azcliversion: latest
     - name: Set permissions 755 on WORKSPACE
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: chmod -R 755 ${{ github.workspace }}
     - name: Set permissions 757 on scripts
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: chmod -R 757 ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts
     - name: 20_A_Calculate subnet allocations_PS
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       working-directory: ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts
       run: |
         sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ env.admin_location}}' -locationSuffixADO '${{ env.admin_locationSuffix }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
       shell: pwsh
     - name: 21_Deploy subnets and NSG
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/cli@v2
       with: 
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/"
