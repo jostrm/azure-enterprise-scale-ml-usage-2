@@ -279,13 +279,32 @@ for env in "${environments[@]}"; do
     # Global: Variables
     create_or_update_variable $env "AIFACTORY_LOCATION" "$AIFACTORY_LOCATION"
     create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
-    create_or_update_variable $env "RUN_JOB1_NETWORKING" "true"
-    create_or_update_variable $env "PROJECT_MEMBERS_EMAILS" "$PROJECT_MEMBERS_EMAILS"
+
+    # Cost optimization
+    create_or_update_variable $env "USE_COMMON_ACR_FOR_PROJECTS" "$USE_COMMON_ACR_FOR_PROJECTS"
+
+    # Seeding keyvault
+    create_or_update_variable $env "AIFACTORY_SEEDING_KEYVAULT_NAME" "$AIFACTORY_SEEDING_KEYVAULT_NAME"
+    create_or_update_variable $env "AIFACTORY_SEEDING_KEYVAULT_RG" "$AIFACTORY_SEEDING_KEYVAULT_RG"
+
+    # Networking
+    create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
     
+    # Project specific settings, for all environments
+    create_or_update_variable $env "PROJECT_MEMBERS_EMAILS" "$PROJECT_MEMBERS_EMAILS"
+    create_or_update_variable $env "PROJECT_TYPE" "$PROJECT_TYPE"
+    create_or_update_variable $env "PROJECT_NUMBER" "$PROJECT_NUMBER"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S"
+    
+    # Misc
+    create_or_update_variable $env "RUN_JOB1_NETWORKING" "true"
+
     # Global: Secrets
     create_or_update_secret $env "AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID" "$AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID"
     
-    # Project Specifics (1st project bootstrap): Secrets
+    # Project Specifics (1st project bootstrap): 
     create_or_update_secret $env "PROJECT_MEMBERS" "$PROJECT_MEMBERS"
     create_or_update_secret $env "PROJECT_MEMBERS_IP_ADDRESS" "$PROJECT_MEMBERS_IP_ADDRESS"
 done
@@ -295,7 +314,7 @@ gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_R
 create_or_update_variable "dev" "AZURE_ENV_NAME" "dev"
 create_or_update_variable "dev" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
 create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$DEV_SUBSCRIPTION_ID"
-create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version_once"
+create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version"
 
 # DEV: Secrets
 create_or_update_secret "dev" "AZURE_CREDENTIALS" "replace_with_dev_sp_credencials"
@@ -304,7 +323,7 @@ create_or_update_secret "dev" "AZURE_CREDENTIALS" "replace_with_dev_sp_credencia
 gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/stage
 create_or_update_variable "stage" "AZURE_ENV_NAME" "test"
 create_or_update_variable "stage" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
-create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID" 
+create_or_update_variable "stage" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID" 
 
 # STAGE: Secrets
 create_or_update_secret "stage" "AZURE_CREDENTIALS" "replace_with_stage_sp_credencials"
@@ -313,7 +332,7 @@ create_or_update_secret "stage" "AZURE_CREDENTIALS" "replace_with_stage_sp_crede
 gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/prod
 create_or_update_variable "prod" "AZURE_ENV_NAME" "prod"
 create_or_update_variable "prod" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
-create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
+create_or_update_variable "prod" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
 
 # PROD: Secrets
 create_or_update_secret "prod" "AZURE_CREDENTIALS" "replace_with_prod_sp_credencials"
