@@ -70,18 +70,21 @@ for env in "${environments[@]}"; do
     create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
     create_or_update_variable $env "RUN_JOB1_NETWORKING" "true"
     create_or_update_variable $env "PROJECT_MEMBERS_EMAILS" "$PROJECT_MEMBERS_EMAILS"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID"
+    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S"
     
     # Global: Secrets
     create_or_update_secret $env "AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID" "$AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID"
     
-    # Project Specifics (1st project bootstrap): Secrets
+    # Project Specifics (1st project bootstrap): 
     create_or_update_secret $env "PROJECT_MEMBERS" "$PROJECT_MEMBERS"
     create_or_update_secret $env "PROJECT_MEMBERS_IP_ADDRESS" "$PROJECT_MEMBERS_IP_ADDRESS"
 done
 
 # DEV variables
 gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/dev
-create_or_update_variable "dev" "AZURE_ENV_NAME" "$DEV_NAME"
+create_or_update_variable "dev" "AZURE_ENV_NAME" "dev"
 create_or_update_variable "dev" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
 create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$DEV_SUBSCRIPTION_ID"
 create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version"
@@ -92,7 +95,7 @@ create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version"
 
 # STAGE variables
 gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/stage
-create_or_update_variable "stage" "AZURE_ENV_NAME" "$STAGE_NAME"
+create_or_update_variable "stage" "AZURE_ENV_NAME" "test"
 create_or_update_variable "stage" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
 create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID" 
 
@@ -102,7 +105,7 @@ create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID"
 
 # PROD variables
 gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/prod
-create_or_update_variable "prod" "AZURE_ENV_NAME" "$PROD_NAME"
+create_or_update_variable "prod" "AZURE_ENV_NAME" "prod"
 create_or_update_variable "prod" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
 create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
 

@@ -22,6 +22,15 @@
 		},
         "common_bastion_subnet_cidr": {
 			"value": "10.XX.33.0/26"
+		},
+		"cidr_default_XX_dev":{
+			"value": 17
+		},
+		"cidr_defaultXX_test":{
+			"value": 18
+		},
+		"cidr_default_XX_prod":{
+			"value": 19
 		}
     }
 }

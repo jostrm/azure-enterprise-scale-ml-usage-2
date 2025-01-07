@@ -1,4 +1,4 @@
-name: infra-project-genai-dev
+name: infra-project-esml
 
 on:
     #push:
@@ -41,7 +41,7 @@ env:
     project_service_principal_Secret_seeding_kv_name: "${{ vars.PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S }}" # Service principle secret, name from seeding keyvault
     
     # PROJECT TYPE specific
-    admin_projectType: "genai-1" # Project type, [esml,genai-1]
+    admin_projectType: "esml" # Project type, [esml,genai-1]
     useCommonACR: "${{ vars.USE_COMMON_ACR_FOR_PROJECTS }}" # Use common Azure Container Registry (save cost), insted of each project having its own.
 
     # OPTIONAL - GENAI specific
@@ -115,20 +115,8 @@ jobs:
     - name: 20_A_Calculate subnet allocations_PS
       working-directory: ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts
       run: |
-        sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ env.admin_location}}' -locationSuffixADO '${{ env.admin_location_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
+        sudo pwsh -Command  ${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ env.admin_location}}' -locationSuffixADO '${{ env.admin_locationSuffix }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
       shell: pwsh
-    - name: 20_B_Calculate subnet allocations_PS
-      if: env.ENABLE_DEBUG_STEP == 'true'
-      uses: azure/powershell@v2
-      #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
-      with: # Warning: Unexpected input(s) 'working-directory', valid inputs are ['inlineScript', 'azcliversion'] Solution: Set-Location -Path
-        inlineScript: |
-          sudo pwsh -Command "
-            Set-Location -Path '${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts';
-            ./subnetCalc.ps1 -bicepPar1 '../../../../../aifactory/parameters/10-esml-globals-1.json' -bicepPar2 '../../../../../aifactory/parameters/10-esml-globals-2-12_13_21_22.json' -bicepPar3 '../../../../../aifactory/parameters/10-esml-globals-4-13_21_22.json' -bicepPar4 '../../../../../aifactory/parameters/21-22-esml-prj-parameters.json' -bicepPar5 '../../../../../aifactory/parameters/10-esml-globals-override.json' -filePath '../../../../../aifactory/parameters/' -spObjId '${{ env.common-sp-appid-value }}' -spSecret '${{ env.common-sp-secret-value }}' -env '${{ env.dev_test_prod }}' -subscriptionId '${{ env.dev_test_prod_sub_id }}' -prjResourceSuffix '${{ env.admin_prjResourceSuffix }}' -aifactorySuffixRGADO '${{ env.admin_aifactorySuffixRG }}' -commonResourceSuffixADO '${{ env.admin_commonResourceSuffix }}' -locationADO '${{ env.admin_location}}' -locationSuffixADO '${{ env.admin_location_SHORT }}' -projectTypeADO '${{ env.admin_projectType }}' -useServicePrincipal
-          "
-        azPSVersion: latest
-        shell: pwsh
     - name: 21_Deploy subnets and NSG
       uses: azure/cli@v2
       with: 
@@ -139,7 +127,7 @@ jobs:
           --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}${{ env.admin_aifactorySuffixRG }}SubnetDeplProj" \
           --subscription "${{ env.dev_test_prod_sub_id }}" \
           --resource-group "$( cat "./aifactory/parameters/subnetParameters.json" | grep vnetResourceGroup -A1 | tail -n1 | cut -d: -f2 | tr -d " \"" )" \
-          --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-genai-1\31-network.bicep" \
+          --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\21-network.bicep" \
           --parameters @"./aifactory/parameters/subnetParameters.json" \
           --parameters @"./aifactory/parameters/10-esml-globals-override.json" \
           --parameters env="${{ env.dev_test_prod }}" \
@@ -185,7 +173,7 @@ jobs:
         run: |
           $resp = Invoke-RestMethod http://ipinfo.io/json | Select -exp ip
           echo "runner_ip=$resp" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-          echo "Environment is (env.AZURE_ENV_NAME): ${{env.dev_test_prod}}"
+          echo "Environment is (vars.AZURE_ENV_NAME): ${{env.dev_test_prod}}"
         shell: pwsh
       - name: Use environment variable
         run: |
@@ -216,7 +204,7 @@ jobs:
             --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
             --subscription "${{ env.dev_test_prod_sub_id }}" \
             --location "${{ env.admin_location }}" \
-            --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-genai-1\32-main.bicep" \
+            --template-file "azure-enterprise-scale-ml\environment_setup\aifactory\bicep\esml-project\22-main.bicep" \
             --parameters adminPassword="$( date +%s | sha256sum | base64 | head -c 32 ; echo )" \
             --parameters @"./aifactory/parameters/10-esml-globals-1.json" \
             --parameters @"./aifactory/parameters/10-esml-globals-2-12_13_21_22.json" \
@@ -227,7 +215,6 @@ jobs:
             --parameters @"./aifactory/parameters/21-22-esml-prj-parameters.json" \
             --parameters @"./aifactory/parameters/dynamicNetworkParams.json" \
             --parameters @"./aifactory/parameters/23-esml-prj-rbac-parameters.json" \
-            --parameters @"./aifactory/parameters/31-esgenai-default.json" \
             --parameters env="${{ env.dev_test_prod }}" \
             --parameters projectNumber="${{ env.project_number_000 }}" \
             --parameters technicalAdminsObjectID="${{ env.technical_admins_ad_object_id }}" \
@@ -253,10 +240,6 @@ jobs:
             --parameters aml_cluster_dev_nodes_override="${{ env.admin_aml_cluster_maxNodes_dev_override }}" \
             --parameters aml_ci_dev_sku_override="${{ env.admin_aml_computeInstance_dev_sku_override }}" \
             --parameters aml_ci_test_prod_sku_override="${{ env.admin_aml_computeInstance_testProd_sku_override }}" \
-            --parameters enablePublicGenAIAccess="${{ env.admin_enablePublicGenAIAccess }}" \
-            --parameters serviceSettingDeployAzureAIVision="${{ env.optional_serviceSettingDeployAzureAIVision }}" \
-            --parameters serviceSettingDeployAzureSpeech="${{ env.optional_serviceSettingDeployAzureSpeech }}" \
-            --parameters serviceSettingDeployAIDocIntelligence="${{ env.optional_serviceSettingDeployAIDocIntelligence }}" \
             --parameters IPwhiteList="${{ env.project_IP_whitelist }}"
           azcliversion: latest
       - name: 10_Remove ADO IP from keyvault FW whitelist
