@@ -140,6 +140,7 @@ jobs:
         inlineScript: |
           echo "Deploying subnets and NSG to subscription: ${{ env.dev_test_prod_sub_id }}"
           az deployment group create \
+          --mode "Incremental" \
           --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}${{ env.admin_aifactorySuffixRG }}SubnetDeplProj" \
           --subscription "${{ env.dev_test_prod_sub_id }}" \
           --resource-group "$( cat "./aifactory/parameters/subnetParameters.json" | grep vnetResourceGroup -A1 | tail -n1 | cut -d: -f2 | tr -d " \"" )" \
@@ -147,8 +148,7 @@ jobs:
           --parameters @"./aifactory/parameters/subnetParameters.json" \
           --parameters @"./aifactory/parameters/10-esml-globals-override.json" \
           --parameters env="${{ env.dev_test_prod }}" \
-          --parameters projectNumber="${{ env.project_number_000 }}" \
-          --mode Incremental
+          --parameters projectNumber="${{ env.project_number_000 }}"
         azcliversion: latest
     - name: 08_az_remove_ip_from_seeding_keyvault_FW_whitelist
       if: env.ENABLE_NETWORKING_JOB  != 'false'
@@ -209,6 +209,7 @@ jobs:
           #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/"
           inlineScript: |
             az deployment sub create \
+            --mode "Incremental" \
             --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
             --subscription "${{ env.dev_test_prod_sub_id }}" \
             --location "${{ env.admin_location }}" \
@@ -249,8 +250,7 @@ jobs:
             --parameters aml_cluster_dev_nodes_override="${{ env.admin_aml_cluster_maxNodes_dev_override }}" \
             --parameters aml_ci_dev_sku_override="${{ env.admin_aml_computeInstance_dev_sku_override }}" \
             --parameters aml_ci_test_prod_sku_override="${{ env.admin_aml_computeInstance_testProd_sku_override }}" \
-            --parameters IPwhiteList="${{ env.project_IP_whitelist }}" \
-            --mode Incremental
+            --parameters IPwhiteList="${{ env.project_IP_whitelist }}"
           azcliversion: latest
       - name: 06_az_remove_ip_from_seeding_keyvault_FW_whitelist
         uses: azure/cli@v2
