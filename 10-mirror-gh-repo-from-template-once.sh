@@ -279,6 +279,8 @@ for env in "${environments[@]}"; do
     # Global: Variables
     create_or_update_variable $env "AIFACTORY_LOCATION" "$AIFACTORY_LOCATION"
     create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
+    create_or_update_variable $env "AIFACTORY_SUFFIX" "$AIFACTORY_SUFFIX"
+    create_or_update_variable $env "AIFACTORY_PREFIX" "$AIFACTORY_PREFIX"
 
     # Cost optimization
     create_or_update_variable $env "USE_COMMON_ACR_FOR_PROJECTS" "$USE_COMMON_ACR_FOR_PROJECTS"
