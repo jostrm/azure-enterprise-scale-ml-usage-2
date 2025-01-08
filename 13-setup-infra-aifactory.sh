@@ -19,114 +19,59 @@ fi
 # DIRECTORIES
 current_dir=$(pwd)
 
-# Function to check if a variable exists
-check_variable_exists() {
-  gh api repos/$GITHUB_NEW_REPO/environments/$1/variables/$2 > /dev/null 2>&1
-}
+# 01 - Ensure Github variables are UPDATED from env file
+./10-create-or-update-github-variables.sh
 
-# Function to create or update a variable
-create_or_update_variable() {
-  local env=$1
-  local name=$2
-  local value=$3
-  if check_variable_exists $env $name; then
-    gh api --method PATCH -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/$env/variables/$name -f value="$value"
-  else
-    gh api --method POST -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/$env/variables -f name=$name -f value="$value"
-  fi
-}
+# 02 - Ensure baseline PARAMETERS files are UPDATED env file (since they are used in the powershell GenDynNetwork, SubCalc, etc)
+ 
+# 03 - Ensure Azure providers are enabled (create if not exists)
+pwsh ./aifactory/esml-util/26-enable-resource-providers.ps1
 
-# Function to check if a secret exists
-check_secret_exists() {
-  gh secret list --repo $GITHUB_NEW_REPO --env $1 | grep -q $2
-}
+# 04 - Ensure Private DNS zones exists in "hub", if flag is set to true
 
-# Function to create or update a secret
-create_or_update_secret() {
-  local env=$1
-  local name=$2
-  local value=$3
-  if check_secret_exists $env $name; then
-    gh secret set $name --repo $GITHUB_NEW_REPO --env $env --body "$value"
-  else
-    gh secret set $name --repo $GITHUB_NEW_REPO --env $env --body "$value"
-  fi
-}
+# 05 - Ensure policies are created on Subscription level
 
-echo -e "${YELLOW}Bootstraps config from .env as Github environment variables and secrets. ${NC}"
+RESOURCE_GROUP="your_resource_group"
+LOCATION="your_location"
+PARAMETERS_FILE="./aifactory/esml-util/28-Initiatives.parameters.json"
+az deployment group create \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./aifactory/esml-util/28-Initiatives.bicep \
+  --parameters @$PARAMETERS_FILE
 
-# Get the GitHub CLI version
-gh_version=$(gh --version | grep -oP '\d+\.\d+\.\d+' | head -n 1)
+# 05- Run Github pipelines (infra-aifactory-common -> infra-project-genai)
 
-# Define environments
-environments=("dev" "stage" "prod")
+# Define variables
+GITHUB_TOKEN="your_personal_access_token"
+REPO_OWNER=${GITHUB_USERNAME} # "your_github_username_or_org"
+REPO_NAME=${GITHUB_USERNAME} # "your_repository_name"
+WORKFLOW_ID_ESML="infra-project-esml.yml"
+WORKFLOW_ID_GENAI="infra-project-genai.yml"
+REF="main"  # or the branch you want to trigger the workflow on
+DEFAULT_ENV="dev"
 
-# AI Factory globals: variables and secrets
-for env in "${environments[@]}"; do
-    echo -e "${YELLOW}Setting variables and secrets for environment: $env${NC}"
-    
-    # Global: Variables
-    create_or_update_variable $env "AIFACTORY_LOCATION" "$AIFACTORY_LOCATION"
-    create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
-    create_or_update_variable $env "AIFACTORY_SUFFIX" "$AIFACTORY_SUFFIX"
-    create_or_update_variable $env "AIFACTORY_PREFIX" "$AIFACTORY_PREFIX"
+if [ ${PROJECT_TYPE} = 'genai-1' ]; then
+    echo -e "${YELLOW} Deploying GENAI project type ${NC}"
+    # Function to trigger workflow_dispatch
+    trigger_workflow_dispatch() {
+      curl -X POST \
+        -H "Accept: application/vnd.github.v3+json" \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID_GENAI}/dispatches \
+        -d "{\"ref\":\"${REF}\",\"inputs\":{\"default\":\"${DEFAULT_ENV}\"}}"
+    }
 
-    # Cost optimization
-    create_or_update_variable $env "USE_COMMON_ACR_FOR_PROJECTS" "$USE_COMMON_ACR_FOR_PROJECTS"
+elif [ ${PROJECT_TYPE} = 'esml' ]; then
+    echo -e "${YELLOW} Deploying ESML project type ${NC}"
+    # Function to trigger workflow_dispatch
+    trigger_workflow_dispatch() {
+      curl -X POST \
+        -H "Accept: application/vnd.github.v3+json" \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID_ESML}/dispatches \
+        -d "{\"ref\":\"${REF}\",\"inputs\":{\"default\":\"${DEFAULT_ENV}\"}}"
+    }
 
-    # Seeding keyvault
-    create_or_update_variable $env "AIFACTORY_SEEDING_KEYVAULT_NAME" "$AIFACTORY_SEEDING_KEYVAULT_NAME"
-    create_or_update_variable $env "AIFACTORY_SEEDING_KEYVAULT_RG" "$AIFACTORY_SEEDING_KEYVAULT_RG"
-
-    # Networking
-    create_or_update_variable $env "AIFACTORY_LOCATION_SHORT" "$AIFACTORY_LOCATION_SHORT"
-    
-    # Project specific settings, for all environments
-    create_or_update_variable $env "PROJECT_MEMBERS_EMAILS" "$PROJECT_MEMBERS_EMAILS"
-    create_or_update_variable $env "PROJECT_TYPE" "$PROJECT_TYPE"
-    create_or_update_variable $env "PROJECT_NUMBER" "$PROJECT_NUMBER"
-    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_APPID"
-    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_OID"
-    create_or_update_variable $env "PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S" "$PROJECT_SERVICE_PRINCIPAL_KV_S_NAME_S"
-    
-    # Misc
-    create_or_update_variable $env "RUN_JOB1_NETWORKING" "true"
-
-    # Global: Secrets
-    create_or_update_secret $env "AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID" "$AIFACTORY_SEEDING_KEYVAULT_SUBSCRIPTION_ID"
-    
-    # Project Specifics (1st project bootstrap): 
-    create_or_update_secret $env "PROJECT_MEMBERS" "$PROJECT_MEMBERS"
-    create_or_update_secret $env "PROJECT_MEMBERS_IP_ADDRESS" "$PROJECT_MEMBERS_IP_ADDRESS"
-done
-
-# DEV variables
-gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/dev
-create_or_update_variable "dev" "AZURE_ENV_NAME" "dev"
-create_or_update_variable "dev" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
-create_or_update_variable "dev" "AZURE_SUBSCRIPTION_ID" "$DEV_SUBSCRIPTION_ID"
-create_or_update_variable "dev" "GH_CLI_VERSION" "$gh_version"
-
-# DEV: Secrets
-#create_or_update_secret "dev" "AZURE_SUBSCRIPTION_ID" "$DEV_SUBSCRIPTION_ID"
-#create_or_update_secret "dev" "AZURE_CREDENTIALS" "replace_with_dev_sp_credencials"
-
-# STAGE variables
-gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/stage
-create_or_update_variable "stage" "AZURE_ENV_NAME" "test"
-create_or_update_variable "stage" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
-create_or_update_variable "stage" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID" 
-
-# STAGE: Secrets
-#create_or_update_secret "stage" "AZURE_SUBSCRIPTION_ID" "$STAGE_SUBSCRIPTION_ID"
-#create_or_update_secret "stage" "AZURE_CREDENTIALS" "replace_with_stage_sp_credencials"
-
-# PROD variables
-gh api --method PUT -H "Accept: application/vnd.github+json" repos/$GITHUB_NEW_REPO/environments/prod
-create_or_update_variable "prod" "AZURE_ENV_NAME" "prod"
-create_or_update_variable "prod" "AZURE_LOCATION" "$AIFACTORY_LOCATION"
-create_or_update_variable "prod" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
-
-# PROD: Secrets
-#create_or_update_secret "prod" "AZURE_SUBSCRIPTION_ID" "$PROD_SUBSCRIPTION_ID"
-#create_or_update_secret "prod" "AZURE_CREDENTIALS" "replace_with_prod_sp_credencials"
+else
+    echo -e "${RED} Unknown project type: ${PROJECT_TYPE} ${NC}"
+fi
