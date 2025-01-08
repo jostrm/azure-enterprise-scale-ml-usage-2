@@ -70,7 +70,7 @@ env:
     admin_private_azureMLStudioUI: true # Private Azure ML Studio UI
     admin_private_DatabricksUI: false # Private Databricks UI
 jobs:
-  job1-deploy-networking-project-genai:
+  job1-deploy-networking-project-esml:
     name: Project Networking
     if: vars.RUN_JOB1_NETWORKING
     environment: ${{github.event.inputs.environment}}
@@ -156,12 +156,12 @@ jobs:
         inlineScript: az keyvault network-rule remove --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $runner_ip
         azcliversion: latest
       #if: always()
-  job2-deploy-services-project-genai:
+  job2-deploy-services-project-esml:
       name: BICEP - EMSL services to RG
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
       if: always()
-      needs: job1-deploy-networking-project-genai
+      needs: job1-deploy-networking-project-esml
       defaults:
         run:
           shell: pwsh
