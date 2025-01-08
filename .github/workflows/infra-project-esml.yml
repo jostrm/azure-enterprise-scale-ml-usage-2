@@ -72,7 +72,7 @@ env:
 jobs:
   job1-deploy-networking-project-esml:
     name: ESML Networking
-    if: vars.RUN_JOB1_NETWORKING != 'false'
+    if: ${{ vars.RUN_JOB1_NETWORKING}} != 'false'
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
     defaults:
@@ -140,7 +140,6 @@ jobs:
         inlineScript: |
           echo "Deploying subnets and NSG to subscription: ${{ env.dev_test_prod_sub_id }}"
           az deployment group create \
-          --mode "Incremental" \
           --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}${{ env.admin_aifactorySuffixRG }}SubnetDeplProj" \
           --subscription "${{ env.dev_test_prod_sub_id }}" \
           --resource-group "$( cat "./aifactory/parameters/subnetParameters.json" | grep vnetResourceGroup -A1 | tail -n1 | cut -d: -f2 | tr -d " \"" )" \
@@ -209,7 +208,6 @@ jobs:
           #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/"
           inlineScript: |
             az deployment sub create \
-            --mode "Incremental" \
             --name "esml-p${{ env.project_number_000 }}-${{ env.dev_test_prod }}-${{ env.admin_locationSuffix }}-${{ env.admin_prjResourceSuffix }}${{ env.admin_commonResourceSuffix }}$PrjDepl" \
             --subscription "${{ env.dev_test_prod_sub_id }}" \
             --location "${{ env.admin_location }}" \

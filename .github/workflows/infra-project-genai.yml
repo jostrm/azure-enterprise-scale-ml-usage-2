@@ -159,8 +159,7 @@ jobs:
           --parameters @"./aifactory/parameters/subnetParameters.json" \
           --parameters @"./aifactory/parameters/10-esml-globals-override.json" \
           --parameters env="${{ env.dev_test_prod }}" \
-          --parameters projectNumber="${{ env.project_number_000 }}" \
-          --mode Incremental
+          --parameters projectNumber="${{ env.project_number_000 }}"
         azcliversion: latest
     - name: 08_az_remove_ip_from_seeding_keyvault_FW_whitelist
       if: env.ENABLE_NETWORKING_JOB  != 'false'
@@ -266,8 +265,7 @@ jobs:
             --parameters serviceSettingDeployAzureAIVision="${{ env.optional_serviceSettingDeployAzureAIVision }}" \
             --parameters serviceSettingDeployAzureSpeech="${{ env.optional_serviceSettingDeployAzureSpeech }}" \
             --parameters serviceSettingDeployAIDocIntelligence="${{ env.optional_serviceSettingDeployAIDocIntelligence }}" \
-            --parameters IPwhiteList="${{ env.project_IP_whitelist }}" \
-            --mode Incremental
+            --parameters IPwhiteList="${{ env.project_IP_whitelist }}"
           azcliversion: latest
       - name: 06_az_remove_ip_from_seeding_keyvault_FW_whitelist
         uses: azure/cli@v2
