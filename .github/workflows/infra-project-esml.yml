@@ -160,7 +160,7 @@ jobs:
       name: BICEP - EMSL services to RG
       environment: ${{github.event.inputs.environment}}
       runs-on: ubuntu-latest
-      if: always()
+      if: success() || cancelled()
       needs: job1-deploy-networking-project-esml
       defaults:
         run:
