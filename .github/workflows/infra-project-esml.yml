@@ -71,8 +71,8 @@ env:
     admin_private_DatabricksUI: false # Private Databricks UI
 jobs:
   job1-deploy-networking-project-esml:
-    name: Project Networking
-    if: vars.RUN_JOB1_NETWORKING
+    name: ESGenAI Networking
+    if: vars.RUN_JOB1_NETWORKING != 'false'
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
     defaults:
