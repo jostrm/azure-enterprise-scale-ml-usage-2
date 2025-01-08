@@ -184,7 +184,7 @@ jobs:
         shell: pwsh
       - name: Echo runner_ip
         run: |
-          echo "The value of runner_ip is $runner_ip"
+          echo "The value of runner_ip is ${{ env.runner_ip }}"
       - name: 02_az_set_ADO_ip_to_sedding_keyvault_FW_whitelist
         uses: azure/cli@v2
         with:
