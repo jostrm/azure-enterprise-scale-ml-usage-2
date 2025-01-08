@@ -182,7 +182,7 @@ jobs:
           echo "runner_ip=$resp" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
           echo "Environment is (vars.AZURE_ENV_NAME): ${{env.dev_test_prod}}"
         shell: pwsh
-      - name: Use environment variable
+      - name: Echo runner_ip
         run: |
           echo "The value of runner_ip is $runner_ip"
       - name: 02_az_set_ADO_ip_to_sedding_keyvault_FW_whitelist
