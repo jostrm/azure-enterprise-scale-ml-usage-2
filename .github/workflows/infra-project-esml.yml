@@ -249,7 +249,8 @@ jobs:
             --parameters aml_cluster_dev_nodes_override="${{ env.admin_aml_cluster_maxNodes_dev_override }}" \
             --parameters aml_ci_dev_sku_override="${{ env.admin_aml_computeInstance_dev_sku_override }}" \
             --parameters aml_ci_test_prod_sku_override="${{ env.admin_aml_computeInstance_testProd_sku_override }}" \
-            --parameters IPwhiteList="${{ env.project_IP_whitelist }}"
+            --parameters IPwhiteList="${{ env.project_IP_whitelist }}" \
+            --mode Incremental
           azcliversion: latest
       - name: 06_az_remove_ip_from_seeding_keyvault_FW_whitelist
         uses: azure/cli@v2
