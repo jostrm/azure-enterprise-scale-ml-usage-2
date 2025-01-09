@@ -22,12 +22,14 @@ current_dir=$(pwd)
 # 01 - Ensure Github variables are UPDATED from env file
 ./10-create-or-update-github-variables.sh
 
-# 02 - Ensure baseline PARAMETERS files are UPDATED env file (since they are used in the powershell GenDynNetwork, SubCalc, etc)
+# 02 - Ensure baseline PARAMETERS files are UPDATED from env file (since they are used in the powershell GenDynNetwork, SubCalc, etc)
  
 # 03 - Ensure Azure providers are enabled (create if not exists)
 pwsh ./aifactory/esml-util/26-enable-resource-providers.ps1
 
 # 04 - Ensure Private DNS zones exists in "hub", if flag is set to true
+
+pwsh ./aifactory/esml-util/27-create-private-dns-zones.ps1 -spID TODO -tenantID TODO -subscriptionID TODO8d1 -resourceGroupName TODO -location 'swedencentral'
 
 # 05 - Ensure policies are created on Subscription level
 
@@ -39,7 +41,7 @@ az deployment group create \
   --template-file ./aifactory/esml-util/28-Initiatives.bicep \
   --parameters @$PARAMETERS_FILE
 
-# 05- Run Github pipelines (infra-aifactory-common -> infra-project-genai)
+# 06- Run Github pipelines (infra-aifactory-common -> infra-project-genai)
 
 # Define variables
 GITHUB_TOKEN="your_personal_access_token"
