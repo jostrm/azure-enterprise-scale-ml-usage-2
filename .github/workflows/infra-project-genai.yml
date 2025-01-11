@@ -24,7 +24,7 @@ env:
     common-sp-secret-seeding-kv-name: "esml-common-bicep-sp-secret"
     admin_hybridBenefit: false # Enable Hybrid Benefits if provisioning VM access via Bastion
     admin_commonResourceSuffix: "-001"
-    admin_prjResourceSuffix: "-001"
+    admin_prjResourceSuffix: "-002"
 
     # ADMIN specific START (only configure once)
     admin_ip_fw: "192.x.x.x" # Do not touch. leave as-is. This is just a placeholder a script will populate later.
