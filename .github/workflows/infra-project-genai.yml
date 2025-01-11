@@ -86,8 +86,8 @@ jobs:
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
         echo "The value of env.project_number_000  is: ${{ env.project_number_000 }}"
     - name: Azure Login
-      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
+      if: env.ENABLE_NETWORKING_JOB  != 'false'
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         enable-AzPSSession: true
