@@ -80,10 +80,11 @@ jobs:
         shell: pwsh
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
-    - name: Print Skip NETWORKING variable
+    - name: Print info
       run: |
         echo "The value of vars.RUN_JOB1_NETWORKING  is: ${{ vars.RUN_JOB1_NETWORKING }}"
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
+        echo "The value of env.project_number_000  is: ${{ env.project_number_000 }}"
     - name: Azure Login
       if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
