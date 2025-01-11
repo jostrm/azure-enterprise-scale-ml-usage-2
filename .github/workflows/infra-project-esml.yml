@@ -106,7 +106,7 @@ jobs:
       if: env.ENABLE_NETWORKING_JOB  != 'false'
       run: |
         echo "The value of runner_ip is: ${{ env.runner_ip }}"
-    - name: 02_az_set_ADO_ip_to_sedding_keyvault_FW_whitelist
+    - name: 02_az_set_ADO_ip_to_seeding_keyvault_FW_whitelist
       if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/cli@v2
       with:
