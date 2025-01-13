@@ -84,6 +84,15 @@ jobs:
       run: |
         echo "The value of vars.RUN_JOB1_NETWORKING  is: ${{ vars.RUN_JOB1_NETWORKING }}"
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
+    - name: Print info
+      run: |
+        echo "The value of env.admin_private_azureMLStudioUI is: ${{ env.admin_private_azureMLStudioUI }}"
+        echo "The value of env.project_number_000  is: ${{ env.project_number_000 }}"
+        echo "The value of env.admin_aks_version_override  is: ${{ env.technical_admins_email }}"
+        echo "The value of env.admin_projectType  is: ${{ env.admin_projectType }}"
+        echo "The value of env.useCommonACR  is: ${{ env.useCommonACR }}"
+        echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
+        echo "The value of env.admin_aks_version_override  is: ${{ env.admin_aks_version_override }}"
     - name: Azure Login
       if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
@@ -167,6 +176,15 @@ jobs:
           shell: pwsh
           #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
       steps:
+      - name: Print info
+        run: |
+          echo "The value of env.admin_private_azureMLStudioUI is: ${{ env.admin_private_azureMLStudioUI }}"
+          echo "The value of env.project_number_000  is: ${{ env.project_number_000 }}"
+          echo "The value of env.admin_aks_version_override  is: ${{ env.technical_admins_email }}"
+          echo "The value of env.admin_projectType  is: ${{ env.admin_projectType }}"
+          echo "The value of env.useCommonACR  is: ${{ env.useCommonACR }}"
+          echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
+          echo "The value of env.admin_aks_version_override  is: ${{ env.admin_aks_version_override }}"
       - name: Azure Login
         uses: azure/login@v2
         with:
