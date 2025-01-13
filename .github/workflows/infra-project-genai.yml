@@ -90,6 +90,15 @@ jobs:
         echo "The value of env.admin_projectType  is: ${{ env.admin_projectType }}"
         echo "The value of env.useCommonACR  is: ${{ env.useCommonACR }}"
         echo "The value of env.admin_aks_version_override  is: ${{ env.admin_aks_version_override }}"
+    - name: Set TLS 1.2
+      run: |
+        pwsh -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12"
+    - name: Set as Powershell repo as trusted
+      run: |
+        pwsh -Command "Register-PSRepository -Default"
+    - name: Install PowershellGet manually
+      run: |
+        pwsh -Command "Install-Module -Name PowerShellGet -Force -AllowClobber"
     - name: Azure Login
       uses: azure/login@v2
       if: env.ENABLE_NETWORKING_JOB  != 'false'
