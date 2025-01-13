@@ -75,9 +75,9 @@ jobs:
     if: ${{ vars.RUN_JOB1_NETWORKING }} == 'true'
     environment: ${{github.event.inputs.environment}}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: pwsh
+    #defaults:
+      #run:
+        #shell: pwsh
         #working-directory: "${{ github.workspace }}/azure-enterprise-scale-ml/environment_setup/aifactory/bicep/scripts/"
     steps:
     - name: Print Skip NETWORKING variable
@@ -93,6 +93,15 @@ jobs:
         echo "The value of env.useCommonACR  is: ${{ env.useCommonACR }}"
         echo "The value of env.ENABLE_NETWORKING_JOB  is: ${{ env.ENABLE_NETWORKING_JOB }}"
         echo "The value of env.admin_aks_version_override  is: ${{ env.admin_aks_version_override }}"
+    - name: Set TLS 1.2
+      run: |
+        pwsh -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12"
+    - name: Set as Powershell repo as trusted
+      run: |
+        pwsh -Command "Register-PSRepository -Default"
+    - name: Install PowershellGet manually
+      run: |
+        pwsh -Command "Install-Module -Name PowerShellGet -Force -AllowClobber"
     - name: Azure Login
       if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
