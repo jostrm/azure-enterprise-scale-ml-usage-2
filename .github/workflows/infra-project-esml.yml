@@ -103,7 +103,6 @@ jobs:
       run: |
         pwsh -Command "Install-Module -Name PowerShellGet -Force -AllowClobber"
     - name: Azure Login
-      if: env.ENABLE_NETWORKING_JOB  != 'false'
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -212,7 +211,7 @@ jobs:
       - name: Echo runner_ip
         run: |
           echo "The value of runner_ip is ${{ env.runner_ip }}"
-      - name: 02_az_set_ADO_ip_to_sedding_keyvault_FW_whitelist
+      - name: 02_az_set_ADO_ip_to_seeding_keyvault_FW_whitelist
         uses: azure/cli@v2
         with:
           inlineScript: az keyvault network-rule add --resource-group ${{ env.admin_bicep_kv_fw_rg }} --name ${{ env.admin_bicep_kv_fw }} --ip-address $runner_ip
